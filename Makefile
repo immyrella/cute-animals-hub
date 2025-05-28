@@ -1,7 +1,7 @@
-flyway-migrate:
-	./gradlew flywayMigrate
+up:
+	docker-compose up -d
 
-run:
-	./gradlew bootRun
+flyway:
+	docker-compose run --rm flyway
 
-start: flyway-migrate run
+start: up flyway
