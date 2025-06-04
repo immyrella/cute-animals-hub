@@ -9,4 +9,14 @@ services:
       - FLYWAY_USER=${DB_USERNAME}
       - FLYWAY_PASSWORD=${DB_PASSWORD}
       - FLYWAY_URL=${DB_URL}
-
+  app:
+    build: .
+    container_name: cute-animals-hub
+    ports:
+      - "8080:8080"
+    depends_on:
+      - flyway
+    environment:
+      - SPRING_DATASOURCE_URL=${DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
