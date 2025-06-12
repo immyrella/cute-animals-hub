@@ -1,11 +1,16 @@
-alter table fluffy_creatures
-    alter COLUMN id drop DEFAULT;
+ALTER TABLE fluffy_creatures
+    ALTER COLUMN id DROP DEFAULT;
 
 DO $$
-begin
-    if not exists (select 1 from pg_class where relname = 'fluffy_id_seq') then
-        CREATE SEQUENCE fluffy_id_seq START 1;
-    end IF;
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_class
+        WHERE relname = 'fluffy_id_seq'
+          AND relkind = 'S'
+    ) THEN
+        CREATE SEQUENCE fluffy_id_seq START 10;
+    END IF;
 END$$;
 
 ALTER TABLE fluffy_creatures

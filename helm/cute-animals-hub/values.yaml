@@ -1,0 +1,14 @@
+image:
+  repository: myrellaa/cute-animals-hub
+  tag: latest
+  pullPolicy: IfNotPresent
+
+flyway:
+  image: flyway/flyway:latest
+  enabled: true
+  locations: filesystem:/flyway/sql
+
+service:
+  port: 8080
+
+resources: { }
