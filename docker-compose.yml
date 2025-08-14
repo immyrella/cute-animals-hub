@@ -1,22 +1,49 @@
 services:
+  postgres:
+    container_name: cute-animals-database
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${POSTGRES_DB} -h localhost" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   flyway:
     container_name: flyway
     image: flyway/flyway:latest
     command: -locations=filesystem:/flyway/sql -connectRetries=60 migrate
     volumes:
       - ./sql_versions:/flyway/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       - FLYWAY_USER=${DB_USERNAME}
       - FLYWAY_PASSWORD=${DB_PASSWORD}
-      - FLYWAY_URL=${DB_URL}
+      - FLYWAY_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+
   app:
     build: .
     container_name: cute-animals-hub
     ports:
       - "8080:8080"
     depends_on:
-      - flyway
+      flyway:
+        condition: service_completed_successfully
     environment:
       - SPRING_DATASOURCE_URL=${DB_URL}
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_FLYWAY_ENABLED=false
+
+volumes:
+  postgres_data:

@@ -8,4 +8,9 @@ import org.mapstruct.Mapper;
 public interface FluffyDtoMapper {
 
     FluffyCreatureDomain toDomain(FluffyCreatureRequestDto fluffyCreatureRequestDto);
+
+    default FluffyCreatureDomain toDomain(String name, FluffyCreatureRequestDto req) {
+        var domain = toDomain(req);
+        return new FluffyCreatureDomain(domain.name(), domain.species(), domain.age(), domain.description());
+    }
 }

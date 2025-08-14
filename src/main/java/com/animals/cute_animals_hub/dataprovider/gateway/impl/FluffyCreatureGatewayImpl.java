@@ -8,6 +8,8 @@ import com.animals.cute_animals_hub.dataprovider.repository.FluffyCreatureReposi
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class FluffyCreatureGatewayImpl implements FluffyCreatureGateway {
@@ -20,4 +22,24 @@ public class FluffyCreatureGatewayImpl implements FluffyCreatureGateway {
         var entity = mapper.toEntity(domain);
         return repository.save(entity);
     }
+
+    @Override
+    public Optional<FluffyCreatureDomain> findByName(String name) {
+        return repository.findByName(name)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public FluffyCreatureDomain update(FluffyCreatureDomain domain) {
+        var existing = repository.findByName(domain.name())
+                .orElseThrow(() -> new IllegalArgumentException("Fluffy not found"));
+
+        existing.setSpecies(domain.species());
+        existing.setAge(domain.age());
+        existing.setDescription(domain.description());
+
+        var updated = repository.save(existing);
+        return mapper.toDomain(updated);
+    }
+
 }
